@@ -8,8 +8,25 @@ import os
 import re
 
 # Load environment variables from .env file
-env_path = pathlib.Path(__file__).parent.parent / '.env'
-load_dotenv(env_path)
+# Try multiple paths to find .env file
+env_paths = [
+    pathlib.Path(__file__).parent.parent / '.env',  # backend/.env
+    pathlib.Path(__file__).parent / '.env',         # backend/app/.env
+    pathlib.Path.cwd() / '.env',                    # Current working directory
+    '.env'                                          # Relative to current directory
+]
+
+env_loaded = False
+for env_path in env_paths:
+    if env_path.exists():
+        print(f"Loading .env from: {env_path}")
+        env_loaded = load_dotenv(env_path)
+        if env_loaded:
+            print(f"Successfully loaded .env from: {env_path}")
+            break
+
+if not env_loaded:
+    print("Warning: Could not load .env file from any location")
 
 
 

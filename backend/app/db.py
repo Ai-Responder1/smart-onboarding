@@ -4,6 +4,11 @@ import os
 from typing import Any, Dict
 from pymongo import MongoClient
 from pymongo.errors import ConnectionFailure, ServerSelectionTimeoutError
+from dotenv import load_dotenv
+
+# Load environment variables if not already loaded
+if not os.environ.get("MONGODB_URI"):
+    load_dotenv()
 
 
 def get_mongo_client() -> MongoClient:
@@ -12,16 +17,38 @@ def get_mongo_client() -> MongoClient:
         raise ValueError("MONGODB_URI environment variable is required for MongoDB Atlas connection")
     
     # MongoDB Atlas connection with proper timeout and retry settings
-    client = MongoClient(
-        mongo_uri,
-        serverSelectionTimeoutMS=10000,  # 10 seconds for Atlas
-        connectTimeoutMS=10000,
-        socketTimeoutMS=10000,
-        maxPoolSize=10,
-        retryWrites=True,
-        w="majority"
-    )
-    return client
+    # Try to fix SSL issues on Windows
+    try:
+        client = MongoClient(
+            mongo_uri,
+            serverSelectionTimeoutMS=30000,  # 30 seconds for Atlas
+            connectTimeoutMS=30000,
+            socketTimeoutMS=30000,
+            maxPoolSize=10,
+            retryWrites=True,
+            w="majority",
+            tls=True,
+            tlsAllowInvalidCertificates=False,
+            tlsAllowInvalidHostnames=False
+        )
+        return client
+    except Exception as e:
+        print(f"First connection attempt failed: {e}")
+        # Fallback: try without explicit TLS settings
+        try:
+            client = MongoClient(
+                mongo_uri,
+                serverSelectionTimeoutMS=30000,
+                connectTimeoutMS=30000,
+                socketTimeoutMS=30000,
+                maxPoolSize=10,
+                retryWrites=True,
+                w="majority"
+            )
+            return client
+        except Exception as e2:
+            print(f"Fallback connection also failed: {e2}")
+            raise e2
 
 
 def get_db():

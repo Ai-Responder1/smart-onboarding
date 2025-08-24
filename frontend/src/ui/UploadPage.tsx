@@ -1,9 +1,11 @@
 import React, { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
 
 const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:8000'
 
 export const UploadPage: React.FC = () => {
+  const navigate = useNavigate()
   const [files, setFiles] = useState<FileList | null>(null)
   const [result, setResult] = useState<string>('')
   const [loading, setLoading] = useState(false)
@@ -474,7 +476,7 @@ export const UploadPage: React.FC = () => {
       
       {/* Floating Home Icon */}
       <div
-        onClick={() => window.location.reload()}
+        onClick={() => navigate('/')}
         style={{
           position: 'fixed',
           bottom: '30px',
@@ -495,7 +497,7 @@ export const UploadPage: React.FC = () => {
           animation: 'pulse 2s infinite'
         }}
         className="hover-lift"
-        title="Click to refresh and see exciting messages"
+        title="Click to go to Home page"
       >
         🏠
       </div>

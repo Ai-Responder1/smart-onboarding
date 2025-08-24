@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 
 interface HomePageProps {
   onOpenChat: () => void
 }
 
 export const HomePage: React.FC<HomePageProps> = ({ onOpenChat }) => {
+  const navigate = useNavigate()
   const [currentMessageIndex, setCurrentMessageIndex] = useState(0)
   const [screenSize, setScreenSize] = useState<'mobile' | 'tablet' | 'desktop'>('desktop')
 
@@ -271,27 +273,27 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenChat }) => {
 
       <style>
         {`
-          @keyframes fadeIn {
-            from {
-              opacity: 0;
-              transform: translateY(10px);
+            @keyframes fadeIn {
+              from {
+                opacity: 0;
+                transform: translateY(10px);
+              }
+              to {
+                opacity: 1;
+                transform: translateY(0);
+              }
             }
-            to {
-              opacity: 1;
-              transform: translateY(0);
+            
+            @keyframes pulse {
+              0%, 100% {
+                opacity: 1;
+              }
+              50% {
+                opacity: 0.5;
+              }
             }
-          }
-          
-          @keyframes pulse {
-            0%, 100% {
-              opacity: 1;
-            }
-            50% {
-              opacity: 0.5;
-            }
-          }
-        `}
-      </style>
-    </div>
-  )
-}
+          `}
+        </style>
+      </div>
+    )
+  }

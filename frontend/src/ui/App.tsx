@@ -1,11 +1,13 @@
-import React, { useMemo, useState, useEffect } from 'react'
+import React, { useMemo, useEffect } from 'react'
+import { Routes, Route, useLocation, useNavigate } from 'react-router-dom'
 import { ChatPage } from './ChatPage'
 import { UploadPage } from './UploadPage'
 import { HomePage } from './HomePage'
 
 export const App: React.FC = () => {
-  const [route, setRoute] = useState<'home' | 'chat' | 'upload'>('home')
-  const [screenSize, setScreenSize] = useState<'mobile' | 'tablet' | 'desktop'>('desktop')
+  const location = useLocation()
+  const navigate = useNavigate()
+  const [screenSize, setScreenSize] = React.useState<'mobile' | 'tablet' | 'desktop'>('desktop')
 
   // Check screen size on mount and resize with more granular breakpoints
   useEffect(() => {
@@ -32,7 +34,7 @@ export const App: React.FC = () => {
   const Nav = useMemo(() => (
     <nav style={{
       background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-      padding: isMobile ? '12px 12px' : isTablet ? '16px 20px' : '20px 24px',
+      padding: isMobile ? '8px 8px' : isTablet ? '10px 16px' : '10px 2px',
       boxShadow: '0 4px 20px rgba(0, 0, 0, 0.1)',
       display: 'flex',
       justifyContent: 'space-between',
@@ -61,7 +63,7 @@ export const App: React.FC = () => {
           fontWeight: 'bold',
           backdropFilter: 'blur(10px)',
           cursor: 'pointer'
-        }} onClick={() => setRoute('home')}>
+        }} onClick={() => navigate('/')}>
           KB
         </div>
         <h1 style={{
@@ -71,7 +73,7 @@ export const App: React.FC = () => {
           fontWeight: '700',
           letterSpacing: '-0.5px',
           cursor: 'pointer'
-        }} onClick={() => setRoute('home')}>
+        }} onClick={() => navigate('/')}>
           Karbon Business
         </h1>
       </div>
@@ -85,30 +87,49 @@ export const App: React.FC = () => {
         backdropFilter: 'blur(10px)'
       }}>
         <button 
-          onClick={() => setRoute('home')}
+          onClick={() => navigate('/')}
           style={{
             padding: isMobile ? '6px 12px' : isTablet ? '8px 16px' : '12px 24px',
-            background: route === 'home' 
+            background: location.pathname === '/' 
               ? 'rgba(255, 255, 255, 0.9)' 
               : 'transparent',
-            color: route === 'home' ? '#667eea' : 'white',
+            color: location.pathname === '/' ? '#667eea' : 'white',
             border: 'none',
             borderRadius: isMobile ? '8px' : '12px',
             cursor: 'pointer',
             fontWeight: '600',
             fontSize: isMobile ? '11px' : isTablet ? '12px' : '14px',
             transition: 'all 0.3s ease',
-            boxShadow: route === 'home' ? '0 4px 12px rgba(0, 0, 0, 0.15)' : 'none'
+            boxShadow: location.pathname === '/' ? '0 4px 12px rgba(0, 0, 0, 0.15)' : 'none'
           }}
         >
           🏠 Home
         </button>
+        <button 
+          onClick={() => navigate('/chat')}
+          style={{
+            padding: isMobile ? '6px 12px' : isTablet ? '8px 16px' : '12px 24px',
+            background: location.pathname === '/chat' 
+              ? 'rgba(255, 255, 255, 0.9)' 
+              : 'transparent',
+            color: location.pathname === '/chat' ? '#667eea' : 'white',
+            border: 'none',
+            borderRadius: isMobile ? '8px' : '12px',
+            cursor: 'pointer',
+            fontWeight: '600',
+            fontSize: isMobile ? '11px' : isTablet ? '12px' : '14px',
+            transition: 'all 0.3s ease',
+            boxShadow: location.pathname === '/chat' ? '0 4px 12px rgba(0, 0, 0, 0.15)' : 'none'
+          }}
+        >
+          💬 Chat
+        </button>
       </div>
     </nav>
-  ), [route, isMobile, isTablet])
+  ), [location.pathname, isMobile, isTablet, navigate])
 
   const handleOpenChat = () => {
-    setRoute('chat')
+    navigate('/chat')
   }
 
   return (
@@ -388,25 +409,24 @@ export const App: React.FC = () => {
            className={`main-content content-wrapper navbar-compensated`}
            style={{ 
              flex: 1,
-             padding: route === 'home' ? '0' : (isMobile ? '12px' : isTablet ? '16px' : '24px'),
-             maxWidth: route === 'home' ? '100%' : (isMobile ? '100%' : isTablet ? '100%' : '1200px'),
-             margin: route === 'home' ? '0' : '0 auto',
+             padding: location.pathname === '/' ? '0' : (isMobile ? '12px' : isTablet ? '16px' : '24px'),
+             maxWidth: location.pathname === '/' ? '100%' : (isMobile ? '100%' : isTablet ? '100%' : '1200px'),
+             margin: location.pathname === '/' ? '0' : '0 auto',
              width: '100%',
              position: 'relative',
              zIndex: 10,
-             marginTop: route === 'home' ? '0' : (isMobile ? '20px' : isTablet ? '24px' : '32px'),
-             paddingTop: route === 'home' ? '0' : (isMobile ? '20px' : isTablet ? '24px' : '32px'),
+             marginTop: location.pathname === '/' ? '0' : (isMobile ? '20px' : isTablet ? '24px' : '32px'),
+             paddingTop: location.pathname === '/' ? '0' : (isMobile ? '20px' : isTablet ? '24px' : '32px'),
              boxSizing: 'border-box',
              overflow: 'hidden'
            }}
          >
-        {route === 'home' ? (
-          <HomePage onOpenChat={handleOpenChat} />
-        ) : route === 'chat' ? (
-          <ChatPage />
-        ) : (
-          <UploadPage />
-        )}
+        <Routes>
+          <Route path="/" element={<HomePage onOpenChat={handleOpenChat} />} />
+          <Route path="/chat" element={<ChatPage />} />
+          <Route path="/upload" element={<UploadPage />} />
+          <Route path="*" element={<HomePage onOpenChat={handleOpenChat} />} />
+        </Routes>
       </div>
     </div>
   )
